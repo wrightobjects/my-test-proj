@@ -184,7 +184,7 @@ label start:
             $ show_pointclick1 = False
             show hinako upset with Dissolve (0.3)
             h "..."
-            h "...Not cool. Not cool at all."
+            h "...Not cool, dude. Not cool at all."
             show hinako happy small with Dissolve (0.3)
             jump failed_to_click
 #    else:

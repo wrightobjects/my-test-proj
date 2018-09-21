@@ -4,7 +4,10 @@
 # name of the character.
 
 # This is the countdown timer. Currently hardcoded to have a length of 7.0 seconds.
-image countdown = DynamicDisplayable (countdown, length = 7.0)
+image countdown7 = DynamicDisplayable (countdown, length = 7.0)
+
+#This is the second timer using the second timer object. Really messy and bad programming but it works for now.
+image countdown10 = DynamicDisplayable (countdown2, length = 8.0)
 
 # Initialize small versions of the in-game portraits. These will be the standard dialogue.
 image hinako happy small = ProportionalScale("hinako happy.png", 700, 1000)
@@ -12,13 +15,14 @@ image hinako upset small = ProportionalScale("hinako upset.png", 700,1000)
 image hinako surprised small = ProportionalScale("hinako surprised.png", 700,1000)
 image hinako sad small = ProportionalScale("hinako sad.png", 700, 1000)
 image hinako blush small = ProportionalScale("hinako blush.png", 700, 1000)
+image hinako happy blush small = ProportionalScale("hinako happy blush.png", 700,1000)
 
 # This is the current start screen. You can change it by editing screens.rpy:358
 image wallpaper:
     "bg dorm night.png" with Dissolve (5.0)
-    pause 10.0
+    pause 6.0
     "bg dorm glow.png" with Dissolve (5.0)
-    pause 8.0
+    pause 6.0
     repeat
 
 # Define our characters. Currently just Hinako.
@@ -26,6 +30,9 @@ define h = Character("Hinako", who_color="#ffffff",who_outlines=[( 1, "#b1d9ef",
 
 #Define some other variables. Note that screen variables are defined in screens.rpy:124
 define num_wrong_clicks = 0
+
+default clicked_on_renpy =False
+default test_cond = False
 
 # The game starts here.
 
@@ -110,7 +117,7 @@ label start:
     h "...What should I do...?"
 
     # We show the countdown timer for choices at the bottom left.
-    show countdown at Position(xalign=0.9, yalign = 0.9)
+    show countdown7 at Position(xalign=0.9, yalign = 0.9)
     $ ui.timer(7.0, ui.jumps("slow"))
 
     # Dialogue choice. The choices don't matter, since all jump to doorchoiceend.
@@ -121,11 +128,11 @@ label start:
             jump no
 
     label slow:
-        hide countdown
+        hide countdown7
         h "That was too slow! I need to think faster!"
         jump decision
     label yes:
-        hide countdown
+        hide countdown7
 
         h "Alright, let's see who it is."
         scene bg black with Dissolve (2.0)
@@ -137,14 +144,15 @@ label start:
         h "Just kidding!"
         jump doorchoiceend
     label no:
-        hide countdown
+        hide countdown7
         h "I shouldn't open the door. There's no telling what could be out there."
         show hinako happy
         h "Good on you, player!"
-        show hinako blush happy with Dissolve (0.3)
+        show hinako happy with Dissolve (0.2)
         h "It's nice to know you care for my safety."
         show hinako happy small with Dissolve (0.5)
         stop music fadeout 0.1
+        jump choseno
 
     # After the choice.
     label doorchoiceend:
@@ -153,7 +161,8 @@ label start:
     show hinako happy small
     h "This is the end of the choices."
     h "Not like the choices actually mattered or anything, since I'd be stupid to open the door regardless."
-    show hinako sad small
+    show hinako upset small
+    label choseno:
     h "..."
     show hinako happy small
     h "Alright, let's continue with this showcase."
@@ -165,14 +174,14 @@ label start:
         linear 1.0 xalign 0.01
     pause 1.0
     $ show_pointclick1 = True
-
     window show
 
     #Bootleg method of forcing the player to click on the lamp.
+
+
+
+    h "For starters, go ahead and try clicking on that lamp."
     label before_lamp:
-
-
-    h "Go ahead and try clicking on that lamp."
 #    jump before_lamp
 
     if not clicked_on_lamp:
@@ -183,29 +192,108 @@ label start:
         else:
             $ show_pointclick1 = False
             show hinako upset with Dissolve (0.3)
+            $ renpy.pause(0.4, hard=True)
             h "..."
-            h "...Not cool, dude. Not cool at all."
-            show hinako happy small with Dissolve (0.3)
+            h "...Not cool, dude. Not cool."
+            show hinako upset small with Dissolve (0.3)
+            h "{i}Sigh...{/i}"
             jump failed_to_click
 #    else:
 #        $ clicked_on_lamp = True
     label lamp_pressed:
     $ show_pointclick1 = False
-    show hinako happy small
+    show hinako happy small with Dissolve (0.3)
     h "You did it! Grats!"
-    h "The implementation wasn't very pretty, but the important thing is that it works!"
+    h "It's not exactly the prettiest lamp, but at the end of the day, the important thing is that it works!"
+
 
     show hinako happy small:
         linear 1.0 xalign 0.1
 
+
+
+    show hinako happy small
+    h "You've done well so far, so keep it up!"
+
     label failed_to_click:
-    h "Next up, we can try out timed point-and-clicks."
+    h "Now, let's take this pointing and clicking up a notch."
+
 
     window hide
     show hinako happy small:
         linear 1.0 xalign 0.01
-    pause 1.0
+    pause 1.4
+    show screen pointclick2()
     window show
+
+
+    h "Try clicking on the Ren'py icon as it moves around the screen."
+
+    while not clicked_on_renpy:
+        h "Too slow!"
+
+    h "You did it! A winner is you!"
+
+    $ clicked_on_renpy = False
+
+    h "See, you can do anything if you put your mind to it!"
+
+    stop music fadeout 1.0
+
+    play music "decision.ogg" fadein 2.6
+
+    show hinako upset small
+
+    h "..."
+
+    h "Okay, now let's try it with an actual timer."
+
+    label beforetimedpc:
+
+    pause 0.2
+
+    show countdown10 at Position(xalign=0.9, yalign = 0.9)
+    $ ui.timer(8.0, Jump("slowagain"))
+
+    show screen pointclick3()
+    h "You have eight seconds. Good luck."
+
+    while not clicked_on_renpy:
+        h "Missed!"
+
+    jump aftertimedpc
+
+
+    label slowagain:
+        hide countdown10
+        hide screen pointclick3
+        h "No good. Get moving!"
+        jump beforetimedpc
+
+    label aftertimedpc:
+        hide countdown10
+        hide screen pointclick3
+        show hinako happy small
+        stop music fadeout 2.0
+        h "Wow!"
+        h "That wasn't shabby at all! Nice work."
+
+    show hinako happy small:
+        linear 1.0 xalign 0.1
+
+    pause 0.5
+
+    h "Let's try out a few more things before we wrap this up."
+
+    show hinako blush small with Dissolve (0.2):
+
+    h "..."
+
+    h "...Actually, I'm feeling a little tired right now. I'm sorry, but let's continue this tomorrow."
+
+    show hinako happy blush with Dissolve (1.5)
+
+    h "Good night!"
 
     # This ends the game.
 

@@ -119,17 +119,48 @@ screen say(who, what):
     #This is my point-and-click boolean. There's only one for now.
     if show_pointclick1:
         use pointclick1()
+#    if show_pointclick2:
+#        use pointclick2()
 
 #Initialize my boolean to false.
 init -2 python:
     show_pointclick1 = False
+#    show_pointclick2 = False
     clicked_on_lamp = False
+
 
 #Here's my point-and-click "screen". Modal doesn't work for some reason but see my bootleg solution @ script.rpy:150
 screen pointclick1():
     modal True
     zorder 100
     imagebutton auto "gui/lamp_%s.png" action Jump("lamp_pressed") xpos 258 ypos 198 focus_mask True clicked [SetVariable("clicked_on_lamp", True)]
+
+screen pointclick2():
+    #Temporarily disable the modal to allow Hinako's dialogue to change if player missed
+#    modal True
+
+    imagebutton auto "gui/renpyicon_%s.png" action [SetVariable("clicked_on_renpy", True), Return(), Hide("pointclick2")] xpos 258 ypos 198 focus_mask True at my_movement
+
+#This is just a copy of pointclick2 with a diff transformation
+screen pointclick3():
+        imagebutton auto "gui/renpyicon_%s.png" action [SetVariable("clicked_on_renpy", True), Return(), Hide("pointclick3")] xpos 258 ypos 198 focus_mask True at my_movement2
+
+init -2:
+    transform my_movement:
+        xalign 0.1 yalign 0.5
+        linear 5.0 xalign 1.0
+        linear 5.0 xalign 0.1
+        repeat
+    transform my_movement2:
+         xalign 0.0 yalign 1.0
+         linear 0.3 xalign 0.0
+         ease 0.3 truecenter
+         pause 0.5
+         alignaround (.5, .5)
+         linear 1.0 yalign 0.0 clockwise circles 3
+         linear 1.0 align (0.5, 1.0) knot (0.0, .33) knot (1.0, .66)
+         linear 0.3 xalign 0.0 yalign 1.0
+         repeat
 
 ## Make the namebox available for styling through the Character object.
 init python:
